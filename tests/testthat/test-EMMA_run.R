@@ -79,6 +79,18 @@ test_that("EMMA_run", {
                                 ont = "CC",
                                 level = 2), store_session_info = "yes"))
   
+  expect_warning(EMMA_run(clusterProfiler::enrichKEGG(gene = "3601",
+                                                      organism = "hsa",
+                                                      keyType = "ncbi-geneid",
+                                                      universe = gene_universe))
+                 )
+  
+  expect_null(EMMA_run(clusterProfiler::enrichKEGG(gene = "3601",
+                                          organism = "hsa",
+                                          keyType = "ncbi-geneid",
+                                          universe = gene_universe))
+              )
+  
 })
 
 

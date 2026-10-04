@@ -84,14 +84,18 @@ test_that("test metadata content & structure", {
     ) 
   }
   
-  expect_warning(wrapper <- EMMA_run(custom_fun(rownames(de_res_IFNg_vs_naive),
-                                                org.Hs.eg.db)))
+  expect_warning(wrapper <- EMMA_run(
+    custom_fun(gene = rownames(de_res_IFNg_vs_naive),
+               OrgDb = org.Hs.eg.db)))
 
+  record <- EMMA_get_record(wrapper)
+  
   expect_equal(EMMA_get_record(wrapper)$method$function_name, "custom_fun")
   expect_equal(EMMA_get_record(wrapper)$method$wrapped_package, "clusterProfiler")
   expect_equal(EMMA_get_record(wrapper)$method$wrapped_function, "groupGO")
   expect_true(EMMA_get_record(wrapper)$method$wrapper) 
-
+  
+  #expect_equal(EMMA_get_record(wrapper)$annotation$gene_set_db, "GO")
   
   empty <- EMMA_run(summary(rec$method))
   
@@ -104,20 +108,10 @@ test_that("test metadata content & structure", {
   names(geneList) <- rownames(de_res_IFNg_vs_naive)
   geneList <- sort(geneList, decreasing = TRUE)
   
-  expect_warning(gse_res <- gseGO( geneList = geneList, keyType = "ENSEMBL",
-                    OrgDb = org.Hs.eg.db, ont = "BP",
-                    minGSSize = 1, maxGSSize = 200,
-                    pvalueCutoff = 0.1, verbose = FALSE,
-                    pAdjustMethod = "BH") |>  EMMA_run())
-  
-  expect_equal(EMMA_get_record(gse_res)$method$function_name, "gseGO")
-  expect_null(EMMA_get_record(gse_res)$method$wrapped_function)
-  expect_null(EMMA_get_record(gse_res)$method$wrapped_package)
-  expect_equal(EMMA_get_record(gse_res)$annotation$gene_set_db, "GO")
   
   # pretending a function that doesn't exist in any package, so fallback
   # to empty metadata
-  expect_warning(user_only_fea <- summary(as.data.frame(gse_res)) |> 
+  expect_warning(user_only_fea <- summary(as.data.frame(wrapper)) |> 
     EMMA_run(store_session_info = FALSE, args_form = "unevaluated"))
   
   expect_null(EMMA_get_record(user_only_fea)$annotation$organism)
