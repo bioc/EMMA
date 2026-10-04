@@ -104,6 +104,12 @@ EMMA_run <- function(expr,
   EMMA_record <- .EMMA_build_record(info_call, args_form, metadata, 
                                    wrapped_original,wrapper,
                                    start_time, store_session_info)
+  
+  if (is.null(results)) {
+    cli::cli_alert_warning(
+      "No result object was returned. The EMMA record could not be attached.")
+    return(results) # return NULL
+  }
     
   # attach EMMA_record as attribute of the results obj
   attr(results, "EMMA_record") <- EMMA_record
